@@ -2,7 +2,6 @@ import React from 'react';
 import styles from './Player.module.scss';
 
 function Player({ playerNumber, value, onChange, onMove, disabled, numbers, isActive, error }) {
-
     const displayNumbers = [0, 1, 2, 3, 4].map((idx) =>
         numbers[idx] !== undefined ? numbers[idx] : '_'
     );
