@@ -95,6 +95,9 @@
     background: #f6f8fa;
     transition: border 0.2s;
 }
+.msgInputRow ::placeholder{
+    font-size: 14px;
+}
 .msgInputRow input:focus {
     border: 1.5px solid #6c8ea3;
     outline: none;
