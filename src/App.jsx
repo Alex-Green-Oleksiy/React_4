@@ -6,56 +6,36 @@ import GameOver from './components/GameOver/GameOver';
 import Messenger from './components/Messenger/Messenger';
 
 function App() {
-    // тут зберігається секретне число
     const secretNumbers = useRef([]);
-    // хто зараз ходить
-    const [currentPlayer, setCurrentPlayer] = useState(1);
-    // числа, які вводив перший гравець
-    const [player1Numbers, setPlayer1Numbers] = useState([]);
-    // числа, які вводив другий гравець
-    const [player2Numbers, setPlayer2Numbers] = useState([]);
-    // що зараз в інпуті у першого
-    const [input1, setInput1] = useState('');
-    // що зараз в інпуті у другого
-    const [input2, setInput2] = useState('');
-    // тут зберігаються вгадані числа (або _ якщо ще не вгадали)
+    const [currentPlayer, setCurrentPlayer] = useState(0); // 0 - перший, 1 - другий
+    const [inputs, setInputs] = useState(['', '']);
+    const [playerNumbers, setPlayerNumbers] = useState([[], []]);
     const [guessedNumbers, setGuessedNumbers] = useState(['_', '_', '_']);
-    // чи закінчилась гра
     const [gameOver, setGameOver] = useState(false);
-    // хто виграв
     const [winner, setWinner] = useState(null);
 
-    // коли сторінка завантажилась, генеруємо секретне число
     useEffect(() => {
         generateSecretNumbers();
     }, []);
 
-    // робимо три різні випадкові числа
     const generateSecretNumbers = () => {
         const numbers = [];
         while (numbers.length < 3) {
             const num = Math.floor(Math.random() * 10);
-            if (!numbers.includes(num)) {
-                numbers.push(num);
-            }
+            if (!numbers.includes(num)) numbers.push(num);
         }
         secretNumbers.current = numbers;
         setGuessedNumbers(['_', '_', '_']);
-        setPlayer1Numbers([]);
-        setPlayer2Numbers([]);
-        setInput1('');
-        setInput2('');
-        setCurrentPlayer(1);
+        setPlayerNumbers([[], []]);
+        setInputs(['', '']);
+        setCurrentPlayer(0);
         setGameOver(false);
         setWinner(null);
     };
 
-    // перевіряємо, чи вже вводили це число
-    const isNumberUsed = (number) => {
-        return player1Numbers.includes(number) || player2Numbers.includes(number);
-    };
+    const isNumberUsed = (number) =>
+        playerNumbers[0].includes(number) || playerNumbers[1].includes(number);
 
-    // якщо є помилка, повертаємо текст помилки
     const getError = (value) => {
         if (!value) return '';
         const number = parseInt(value);
@@ -64,68 +44,53 @@ function App() {
         return '';
     };
 
-    // коли натискаємо "зробити хід"
-    const handleMove = (player) => {
-        const value = player === 1 ? input1 : input2;
+    const handleInputChange = (idx, e) => {
+        const val = e.target.value.replace(/\D/g, '').slice(0, 1);
+        setInputs((inputs) => inputs.map((v, i) => (i === idx ? val : v)));
+    };
+
+    const handleMove = (idx) => {
+        const value = inputs[idx];
         const number = parseInt(value);
         if (isNaN(number) || isNumberUsed(number)) return;
         const index = secretNumbers.current.indexOf(number);
+        let newGuessedNumbers = guessedNumbers;
         if (index !== -1) {
-            // якщо вгадали, показуємо це число
-            const newGuessedNumbers = [...guessedNumbers];
+            newGuessedNumbers = [...guessedNumbers];
             newGuessedNumbers[index] = number;
             setGuessedNumbers(newGuessedNumbers);
-            // якщо всі вгадані, гра закінчилась
             if (!newGuessedNumbers.includes('_')) {
                 setGameOver(true);
-                setWinner(currentPlayer === 1 ? 2 : 1);
+                setWinner(idx === 0 ? 1 : 0);
             }
         }
-        if (player === 1) {
-            setPlayer1Numbers([...player1Numbers, number]);
-            setInput1('');
-            setCurrentPlayer(2);
-        } else {
-            setPlayer2Numbers([...player2Numbers, number]);
-            setInput2('');
-            setCurrentPlayer(1);
-        }
+        setPlayerNumbers((nums) => nums.map((arr, i) => (i === idx ? [...arr, number] : arr)));
+        setInputs((inputs) => inputs.map((v, i) => (i === idx ? '' : v)));
+        setCurrentPlayer((cur) => 1 - cur);
     };
 
     return (
         <div className="app">
             <h1>Гра "Вгадай число"</h1>
-
             <div className="gameContainer">
                 <SecretNumber guessedNumbers={guessedNumbers} />
-
                 <div className="players">
-                    <Player
-                        playerNumber={1}
-                        value={input1}
-                        onChange={(e) => setInput1(e.target.value.replace(/\D/g, '').slice(0, 1))}
-                        onMove={() => handleMove(1)}
-                        disabled={!!getError(input1) || gameOver}
-                        numbers={player1Numbers}
-                        isActive={currentPlayer === 1 && !gameOver}
-                        error={getError(input1)}
-                    />
-                    <Player
-                        playerNumber={2}
-                        value={input2}
-                        onChange={(e) => setInput2(e.target.value.replace(/\D/g, '').slice(0, 1))}
-                        onMove={() => handleMove(2)}
-                        disabled={!!getError(input2) || gameOver}
-                        numbers={player2Numbers}
-                        isActive={currentPlayer === 2 && !gameOver}
-                        error={getError(input2)}
-                    />
+                    {[0, 1].map((idx) => (
+                        <Player
+                            key={idx}
+                            playerNumber={idx + 1}
+                            value={inputs[idx]}
+                            onChange={(e) => handleInputChange(idx, e)}
+                            onMove={() => handleMove(idx)}
+                            disabled={!!getError(inputs[idx]) || gameOver}
+                            numbers={playerNumbers[idx]}
+                            isActive={currentPlayer === idx && !gameOver}
+                            error={getError(inputs[idx])}
+                        />
+                    ))}
                 </div>
-
-                {gameOver && <GameOver winner={winner} onRestart={generateSecretNumbers} />}
+                {gameOver && <GameOver winner={winner + 1} onRestart={generateSecretNumbers} />}
             </div>
-
-            {/* Месенджер під грою */}
             <Messenger />
         </div>
     );

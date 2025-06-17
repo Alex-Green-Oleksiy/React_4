@@ -2,7 +2,7 @@ import React from 'react';
 import styles from './Player.module.scss';
 
 function Player({ playerNumber, value, onChange, onMove, disabled, numbers, isActive, error }) {
-    // Завжди рендеримо 5 спанів, якщо числа немає — показуємо '_'
+
     const displayNumbers = [0, 1, 2, 3, 4].map((idx) =>
         numbers[idx] !== undefined ? numbers[idx] : '_'
     );
