@@ -71,7 +71,7 @@
     padding: 8px 18px;
     font-size: 18px;
     background: #6c8ea3;
-    color: #fff;
+    color: #cd0d0d;
     border: none;
     border-radius: 5px;
     cursor: pointer;
@@ -83,7 +83,7 @@
     color: #fff;
 }
 .move-button:disabled {
-    background: #cccccc;
+    background: #836666;
     color: #888;
     cursor: not-allowed;
 }
@@ -95,4 +95,19 @@
     text-align: left;
     min-height: 18px;
     display: block;
+}
+div > button{
+    background: #6c8ea338;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 400;
+    transition: background 0.2s, color 0.2s;
+    &:hover{
+        background: #7bb274b2;
+    }
+}
+div > label > input {
+    margin-top: 10px;
 }
