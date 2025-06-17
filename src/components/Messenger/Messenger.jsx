@@ -5,7 +5,11 @@ function Messenger() {
     const [messages, setMessages] = useState([
         { text: 'Мені скучно...', likes: 0, dislikes: 0 },
         { text: 'Лови жарт.', likes: 0, dislikes: 0 },
+        { text: 'Давай.', likes: 0, dislikes: 0 },
+
         { text: 'Чому програмісти не бояться темряви?', likes: 0, dislikes: 0 },
+        { text: 'Ну і ?', likes: 0, dislikes: 0 },
+
         { text: 'Бо після смерті все одно буде чорний екран консолі.', likes: 0, dislikes: 100 },
         { text: 'Я піду краще, попрацюю.', likes: 2, dislikes: 0 },
     ]);
